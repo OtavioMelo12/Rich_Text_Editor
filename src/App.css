@@ -1,7 +1,7 @@
 div.app {
   background-color: #f0f0f0;
-  height: 100%;
-  padding: 20px;
+  min-height: 100%;
+  padding: 20px 12%;
 }
 
 div.editor {
@@ -9,9 +9,6 @@ div.editor {
   padding: 50px;
   padding-top: 20px;
   border-radius: 10px;
-
-  display: flex;
-  flex-direction: column;
 }
 
 div.toolbar {

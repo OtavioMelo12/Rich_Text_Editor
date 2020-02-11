@@ -1,12 +1,32 @@
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
-import  { MdCode, MdFormatBold, MdFormatItalic } from 'react-icons/md';
+import{ 
+        MdCode, 
+        MdFormatBold,
+        MdFormatItalic, 
+        MdFormatUnderlined, 
+        MdFormatQuote, 
+        MdLooksOne, 
+        MdLooksTwo, 
+        MdFormatListBulleted, 
+        MdFormatListNumbered 
+      } from 'react-icons/md';
 
 import { createEditor } from 'slate';
 import { Slate, Editable, withReact } from 'slate-react';
 
 import './App.css';
 
-import { toggleCodeBlock, toggleItalicMark, toggleBoldMark } from './helpers/customEditor'
+import{ 
+        toggleCodeBlock, 
+        toggleItalicMark, 
+        toggleBoldMark, 
+        toggleUnderlineMark,
+        toggleQuoteBlock, 
+        toggleHeadingOne, 
+        toggleHeadingTwo,
+        toggleListItem,
+        toggleNumberedList 
+      } from './helpers/customEditor'
 
 
 
@@ -17,16 +37,7 @@ const App = () => {
     || '' || initialValue
   )
 
-  const [isBoldActive, setIsBoldActive] = useState(false)
-
-  const renderElement = useCallback(props => {
-    switch (props.element.type) {
-      case 'code':
-        return <CodeElement {...props} />
-      default:
-        return <DefaultElement {...props} />
-    }
-  }, [])
+  const renderElement = useCallback(props => <Element {...props} />, [])
 
   const renderLeaf = useCallback(props => {
     return <Leaf {...props} />
@@ -61,12 +72,60 @@ const App = () => {
                   toggleItalicMark(editor)
                 }}
               />
+              <MdFormatUnderlined
+                size={30}
+                style={{color: '#999', margin: '0 10px', cursor: 'pointer'}}
+                onMouseDown={event => {
+                  event.preventDefault()
+                  toggleUnderlineMark(editor)
+                }}
+              />
               <MdCode
                 size={30}
                 style={{color: '#999', margin: '0 10px', cursor: 'pointer' }}
                 onMouseDown={event => {
                   event.preventDefault()
                   toggleCodeBlock(editor)
+                }}
+              />
+              <MdFormatQuote
+                size={30}
+                style={{color: '#999', margin: '0 10px', cursor: 'pointer' }}
+                onMouseDown={event => {
+                  event.preventDefault()
+                  toggleQuoteBlock(editor)
+                }}
+              />
+              <MdLooksOne
+                size={30}
+                style={{color: '#999', margin: '0 10px', cursor: 'pointer' }}
+                onMouseDown={event => {
+                  event.preventDefault()
+                  toggleHeadingOne(editor)
+                }}
+              />
+              <MdLooksTwo
+                size={30}
+                style={{color: '#999', margin: '0 10px', cursor: 'pointer' }}
+                onMouseDown={event => {
+                  event.preventDefault()
+                  toggleHeadingTwo(editor)
+                }}
+              />
+              <MdFormatListNumbered
+                size={30}
+                style={{color: '#999', margin: '0 10px', cursor: 'pointer' }}
+                onMouseDown={event => {
+                  event.preventDefault()
+                  toggleNumberedList(editor)
+                }}
+              />
+              <MdFormatListBulleted
+                size={30}
+                style={{color: '#999', margin: '0 10px', cursor: 'pointer' }}
+                onMouseDown={event => {
+                  event.preventDefault()
+                  toggleListItem(editor)
                 }}
               />
           </div>
@@ -81,9 +140,7 @@ const App = () => {
               if (!event.ctrlKey) {
                 return
               }
-
               switch (event.key) {
-
                 case 'k': {
                   event.preventDefault()
                   toggleCodeBlock(editor)
@@ -101,6 +158,12 @@ const App = () => {
                   toggleItalicMark(editor)
                   break
                 }
+
+                case 'u': {
+                  event.preventDefault()
+                  toggleUnderlineMark(editor)
+                  break
+                }
               }
             }}
           />
@@ -110,25 +173,70 @@ const App = () => {
   )
 }
 
-const CodeElement = props => {
-  return (
-    <pre {...props.attributes}>
-      <code>{props.children}</code>
-    </pre>
-  )
-}
+const Element = props => {
+  switch (props.element.type) {
+    case 'code':
+      return  (
+        <pre {...props.attributes}>
+          <code 
+                  style={
+                    {
+                      background: '#f0f0f0', 
+                      padding: '5px',
+                      borderLeft: 'solid 4px #509ef1'
+                    }
+                  }
+                >
+                  {props.children}
+          </code>
+        </pre>  
+      )
+    
+    case 'block-quote':
+      return (
+        <pre {...props.attributes}>
+          <blockquote 
+            style={
+              {
+                color: '#999',
+                fontSize: '14px',
+                fontStyle: 'italic',
+                borderLeft: 'solid 2px #999', 
+                padding: '5px'
+              }
+            } 
+          >
+            {props.children}
+          </blockquote>
+        </pre>
+      )
 
-const DefaultElement = props => {
-  return <p {...props.attributes}>{props.children}</p>
+    case 'heading-one':
+      return <h1 {...props.attributes}>{props.children}</h1>
+
+    case 'heading-two':
+      return <h2 {...props.attributes}>{props.children}</h2>
+
+    case 'list-item':
+      return <li {...props.attributes}>{props.children}</li>
+      
+    case 'numbered-list':
+      return (
+        <ol>
+          <li {...props.attributes}>{props.children}</li>
+        </ol>
+       
+      )
+      
+    
+    default:
+      return <p style={{padding: '5px 0'}} {...props.attributes}>{props.children}</p>
+  }
 }
 
 const Leaf = ({ attributes, children, leaf }) => {
   if (leaf.bold) {
     children = <strong>{children}</strong>
-  }
-
-  if (leaf.code) {
-    children = <code>{children}</code>
   }
 
   if (leaf.italic) {
